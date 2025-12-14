@@ -34,7 +34,7 @@ def subscribe():
     if not is_valid_msisdn(msisdn):
         return jsonify({"error": "Invalid MSISDN. Use 2547XXXXXXXX or 2541XXXXXXXX"}), 400
 
-    if "otp" not in 
+    if "otp" not in data:
         success = generate_and_send_otp(msisdn)
         if success:
             otp_code = otp_store[msisdn]["code"]
