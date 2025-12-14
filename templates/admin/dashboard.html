@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Call Sign Admin</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 20px; background: #f8fafc; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    h1 { color: #2d3c48; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #edf2f7; }
+    th { background: #f1f5f9; font-weight: 600; color: #475569; }
+    tr:hover { background: #f8fafc; }
+    .msisdn { font-family: monospace; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CallCheck Admin Dashboard</h1>
+    <p>{{ subscriptions|length }} total subscriptions</p>
+    <table>
+      <thead>
+        <tr>
+          <th>MSISDN</th>
+          <th>Product</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub in subscriptions %}
+        <tr>
+          <td class="msisdn">{{ sub.msisdn }}</td>
+          <td>{{ sub.product_name }}</td>
+          <td>{{ sub.timestamp }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

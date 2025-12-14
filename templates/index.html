@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Call Sign — Subscribe Now</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
+    body { background:#f8f9fa; color:#2d3748; padding:20px; }
+    .container { max-width:500px; margin:40px auto; background:white; padding:30px; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,0.08); text-align:center; }
+    .logo { font-size:2.2rem; margin-bottom:16px; }
+    h1 { font-size:1.8rem; color:#2b6cb0; margin-bottom:12px; }
+    p { margin:12px 0; color:#4a5568; }
+    .highlight { font-weight:600; color:#2b6cb0; }
+    input { width:100%; padding:14px; margin:16px 0; border:1px solid #e2e8f0; border-radius:10px; font-size:16px; outline:none; }
+    input:focus { border-color:#4299e1; box-shadow:0 0 0 3px rgba(66,153,225,0.2); }
+    button { background:#2b6cb0; color:white; border:none; padding:14px 20px; width:100%; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; }
+    button:hover { background:#2c5282; }
+    .error { color:#e53e3e; font-size:14px; margin-top:8px; }
+    .step { display:none; }
+    .active { display:block; }
+    .success-icon { font-size:2.5rem; color:#38a169; margin:16px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">📱</div>
+    <h1>Call Sign Subscription</h1>
+    <p>Get premium content daily for just <span class="highlight">KES 2.00/day</span></p>
+
+    <div id="step1" class="step active">
+      <input type="tel" id="phone" placeholder="Enter phone number (e.g. 0712345678)" />
+      <button id="sendOtpBtn">Send OTP</button>
+      <p id="phoneError" class="error"></p>
+    </div>
+
+    <div id="step2" class="step">
+      <input type="text" id="otp" placeholder="Enter 6-digit OTP" maxlength="6" />
+      <button id="verifyOtpBtn">Complete Subscription</button>
+      <p id="otpError" class="error"></p>
+      <p style="font-size:14px;color:#718096;margin-top:8px;">Check your SMS for the OTP</p>
+    </div>
+
+    <div id="step3" class="step">
+      <div class="success-icon">✅</div>
+      <h2>Subscribed!</h2>
+      <p>You're now subscribed to Call Sign at <span class="highlight">KES 2.00/day</span>.</p>
+      <p>Reply <strong>STOP</strong> to 22141 to unsubscribe anytime.</p>
+      <button id="restartBtn" style="margin-top:20px;">Subscribe Another Number</button>
+    </div>
+  </div>
+
+  <script>
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const phone = document.getElementById('phone');
+    const otp = document.getElementById('otp');
+    const sendOtpBtn = document.getElementById('sendOtpBtn');
+    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const phoneErr = document.getElementById('phoneError');
+    const otpErr = document.getElementById('otpError');
+
+    function show(step) {
+      step1.classList.remove('active');
+      step2.classList.remove('active');
+      step3.classList.remove('active');
+      document.getElementById(step).classList.add('active');
+    }
+
+    function err(el, msg) {
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function intl(num) {
+      let clean = num.replace(/\D/g, '');
+      return clean.startsWith('0') ? '254' + clean.substring(1) : clean;
+    }
+
+    sendOtpBtn.onclick = async () => {
+      phoneErr.textContent = '';
+      let msisdn = intl(phone.value.trim());
+      if (!msisdn || !/^(2547|2541)\d{8}$/.test(msisdn)) {
+        return err(phoneErr, 'Enter a valid Kenyan number (07... or 01...)');
+      }
+      try {
+        const res = await fetch('/api/v1/subscribe', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ msisdn, product_name: "Call Sign" })
+        });
+        const d = await res.json();
+        if (res.ok && d.status === 'otp_sent') show('step2');
+        else err(phoneErr, d.error || 'Failed to send OTP');
+      } catch (e) {
+        err(phoneErr, 'Network error');
+      }
+    };
+
+    verifyOtpBtn.onclick = async () => {
+      otpErr.textContent = '';
+      let code = otp.value.trim();
+      if (code.length !== 6) return err(otpErr, 'Enter 6-digit OTP');
+      let msisdn = intl(phone.value.trim());
+      try {
+        const res = await fetch('/api/v1/subscribe', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ msisdn, product_name: "Call Sign", otp: code })
+        });
+        const d = await res.json();
+        if (res.ok && d.status === 'success') show('step3');
+        else err(otpErr, d.error || 'Invalid OTP');
+      } catch (e) {
+        err(otpErr, 'Verification failed');
+      }
+    };
+
+    restartBtn.onclick = () => {
+      phone.value = '';
+      otp.value = '';
+      show('step1');
+      phoneErr.textContent = '';
+      otpErr.textContent = '';
+    };
+  </script>
+</body>
+</html>
