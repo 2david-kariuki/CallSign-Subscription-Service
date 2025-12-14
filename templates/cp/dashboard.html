@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><title>CallCheck - CP Dashboard</title><style>body{font-family:sans-serif;background:#f8fafc;padding:20px;}.container{max-width:1000px;margin:40px auto;background:white;padding:30px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}</style></head>
+<body>
+<div class="container">
+  <h2>Lahamuran Dashboard</h2>
+  <p>Subscriptions for CP: <strong>{{ cp_id }}</strong></p>
+  <table border="1" style="width:100%;border-collapse:collapse;margin-top:20px;">
+    <tr><th>MSISDN</th><th>Product</th><th>Channel</th><th>Timestamp</th></tr>
+    {% for sub in subscriptions %}
+    <tr><td>{{ sub.msisdn }}</td><td>{{ sub.product_name }}</td><td>{{ sub.channel_id }}</td><td>{{ sub.timestamp }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+</body>
+</html>
