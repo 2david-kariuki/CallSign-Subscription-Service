@@ -22,7 +22,10 @@ def subscribe():
     if "otp" not in data:
         success = generate_and_send_otp(msisdn)
         if success:
-            return jsonify({"status": "otp_sent", "message": "OTP sent to your phone"})
+        # Add debug OTP for testing
+        from app.services.otp_service import otp_store
+        otp_code = otp_store[msisdn]["code"]
+        return jsonify({"status": "otp_sent", "message": "OTP sent to your phone", "otp_debug": otp_code})
         else:
             return jsonify({"error": "Failed to send OTP"}), 500
     else:
