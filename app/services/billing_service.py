@@ -1,7 +1,6 @@
 from flask import current_app, session
 import time
 
-# In-memory storage
 subscriptions = []
 
 def activate_subscription(msisdn: str, product_name: str) -> bool:
